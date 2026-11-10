@@ -1,0 +1,621 @@
+/* ==========================================================================
+   STYLE.CSS - ĐỘI EVENT UIT | HỆ THỐNG BỐC THĂM LỜI CHÚC SINH NHẬT
+   Theme: Vàng chanh (Lemon Yellow) đặc trưng Đội Event - UIT
+   Thiết kế phong cách Neo-Brutalist Pop tươi trẻ, năng động, thủ công sinh viên
+   ========================================================================== */
+
+/* FONT DECLARATIONS */
+@font-face {
+    font-family: 'Lexend';
+    src: url('./assets/fonts/Lexend-VariableFont_wght.ttf') format('truetype');
+    font-weight: 100 900;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'UTM Bitsumishi Pro';
+    src: url('./assets/fonts/UTM Bitsumishi Pro.ttf') format('truetype');
+    font-weight: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'UTM Sharnay';
+    src: url('./assets/fonts/UTM Sharnay.ttf') format('truetype');
+    font-weight: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Instagram Regular';
+    src: url('./assets/fonts/Instagram Regular.ttf') format('truetype');
+    font-weight: normal;
+    font-display: swap;
+}
+
+:root {
+    /* ĐỘI EVENT BRAND PALETTE */
+    --color-lemon-primary: #F0F638;       /* Vàng chanh đặc trưng Event */
+    --color-lemon-bright: #F7FE45;        /* Vàng chanh phát sáng */
+    --color-lemon-soft: #FCFFE0;          /* Vàng chanh nhạt nền thẻ */
+    --color-lemon-border: #D8DF12;        /* Viền vàng đậm */
+    --color-event-green: #1B5E20;         /* Xanh lá đậm logo Event */
+    --color-event-green-light: #2E7D32;   /* Xanh lá tươi */
+    --color-event-blue: #0284C7;          /* Xanh dương Ban Truyền thông */
+    
+    /* NEUTRAL & INK */
+    --color-ink: #18181B;                 /* Đen mực sắc nét */
+    --color-ink-muted: #52525B;           /* Xám chữ phụ */
+    --color-paper: #FFFDF7;               /* Màu giấy trắng ngà ấm */
+    --color-bg-page: #FAF9F0;             /* Màu nền trang ấm áp */
+    
+    /* SHADOWS & BORDERS */
+    --border-hard: 2.5px solid var(--color-ink);
+    --border-thin: 1.5px solid var(--color-ink);
+    --shadow-pop-sm: 3px 3px 0px var(--color-ink);
+    --shadow-pop: 5px 5px 0px var(--color-ink);
+    --shadow-pop-lg: 8px 8px 0px var(--color-ink);
+    --shadow-pop-yellow: 6px 6px 0px #C7CE11;
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+html, body {
+    min-height: 100vh;
+    font-family: 'Lexend', 'Be Vietnam Pro', -apple-system, sans-serif;
+    background-color: var(--color-bg-page);
+    color: var(--color-ink);
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+}
+
+/* NỀN HỌA TIẾT CHẤM BI HỌC SINH SINH VIÊN (DOT GRID AUTHENTIC) */
+.bg-notebook-pattern {
+    background-color: #FAF9F0;
+    background-image: radial-gradient(#E2E0D4 1.2px, transparent 1.2px);
+    background-size: 24px 24px;
+}
+
+/* CUSTOM SCROLLBAR CHUẨN VÀNG CHANH */
+::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+}
+
+::-webkit-scrollbar-track {
+    background: #F4F3E8;
+    border-left: 2px solid var(--color-ink);
+}
+
+::-webkit-scrollbar-thumb {
+    background: var(--color-lemon-primary);
+    border: 2px solid var(--color-ink);
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #DCE318;
+}
+
+/* TYPOGRAPHY UTILITIES */
+.font-event-display {
+    font-family: 'UTM Bitsumishi Pro', 'Lexend', sans-serif;
+    letter-spacing: 0.5px;
+}
+
+.font-handwriting {
+    font-family: 'Caveat', 'Playpen Sans', cursive;
+}
+
+/* NEO-POP CARDS CHUẨN THỦ CÔNG SINH VIÊN (AUTHENTIC HUMAN DESIGN) */
+.card-tactile {
+    background: var(--color-paper);
+    border: var(--border-hard);
+    box-shadow: var(--shadow-pop);
+    border-radius: 16px;
+    transition: transform 0.2s cubic-bezier(0.2, 0, 0, 1), box-shadow 0.2s ease;
+}
+
+.card-tactile:hover {
+    box-shadow: var(--shadow-pop-lg);
+}
+
+.card-lemon {
+    background: linear-gradient(135deg, #F8FF66 0%, #EFFE38 100%);
+    border: var(--border-hard);
+    box-shadow: var(--shadow-pop);
+    border-radius: 18px;
+    color: var(--color-ink);
+}
+
+.card-postit {
+    background: #FEFFD6;
+    border: 2px solid #18181B;
+    box-shadow: 4px 5px 0px rgba(24, 24, 27, 0.9);
+    border-radius: 12px;
+    position: relative;
+}
+
+/* WASHI TAPE TRANG TRÍ ĐẦU THẺ */
+.washi-tape-top {
+    position: absolute;
+    top: -12px;
+    left: 50%;
+    transform: translateX(-50%) rotate(-1.5deg);
+    width: 130px;
+    height: 24px;
+    background: rgba(235, 247, 56, 0.85);
+    border: 1px dashed rgba(24, 24, 27, 0.4);
+    box-shadow: 0 2px 4px rgba(0,0,0,0.06);
+    z-index: 10;
+    pointer-events: none;
+}
+
+/* STAMP - TEM BƯU ĐIỆN VINTAGE SINH NHẬT */
+.postal-stamp {
+    display: inline-flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 6px 14px;
+    border: 2px dashed var(--color-event-green);
+    background: #F1FCE8;
+    color: var(--color-event-green);
+    border-radius: 8px;
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    transform: rotate(-3deg);
+}
+
+/* BADGES PHÂN BAN */
+.badge-dept-event {
+    background-color: #DCFCE7;
+    color: #14532D;
+    border: 1.5px solid #166534;
+    font-weight: 700;
+    padding: 3px 10px;
+    border-radius: 9999px;
+    font-size: 12px;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.badge-dept-media {
+    background-color: #E0F2FE;
+    color: #075985;
+    border: 1.5px solid #0284C7;
+    font-weight: 700;
+    padding: 3px 10px;
+    border-radius: 9999px;
+    font-size: 12px;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+}
+
+/* BUTTONS TACTILE CLICKABLE */
+.btn-event-primary {
+    background-color: var(--color-lemon-primary);
+    color: var(--color-ink);
+    border: var(--border-hard);
+    box-shadow: var(--shadow-pop);
+    font-weight: 800;
+    border-radius: 12px;
+    padding: 12px 24px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: all 0.12s ease;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    text-decoration: none;
+    user-select: none;
+}
+
+.btn-event-primary:hover:not(:disabled) {
+    background-color: var(--color-lemon-bright);
+    transform: translate(-2px, -2px);
+    box-shadow: 7px 7px 0px var(--color-ink);
+}
+
+.btn-event-primary:active:not(:disabled) {
+    transform: translate(3px, 3px);
+    box-shadow: 2px 2px 0px var(--color-ink);
+}
+
+.btn-event-primary:disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
+    background-color: #E4E4E7;
+    border-color: #A1A1AA;
+    box-shadow: 3px 3px 0px #A1A1AA;
+}
+
+.btn-event-secondary {
+    background-color: #FFFFFF;
+    color: var(--color-ink);
+    border: var(--border-hard);
+    box-shadow: var(--shadow-pop-sm);
+    font-weight: 700;
+    border-radius: 10px;
+    padding: 10px 18px;
+    font-size: 14px;
+    cursor: pointer;
+    transition: all 0.12s ease;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+}
+
+.btn-event-secondary:hover {
+    background-color: #F4F4F5;
+    transform: translate(-1px, -1px);
+    box-shadow: 4px 4px 0px var(--color-ink);
+}
+
+.btn-event-secondary:active {
+    transform: translate(2px, 2px);
+    box-shadow: 1px 1px 0px var(--color-ink);
+}
+
+/* INPUT & TEXTAREA TACTILE */
+.input-event {
+    background-color: #FFFFFF;
+    border: var(--border-hard);
+    border-radius: 12px;
+    padding: 14px 18px;
+    font-size: 16px;
+    font-family: inherit;
+    font-weight: 600;
+    color: var(--color-ink);
+    width: 100%;
+    outline: none;
+    box-shadow: 3px 3px 0px rgba(24, 24, 27, 0.15);
+    transition: all 0.2s ease;
+}
+
+.input-event:focus {
+    background-color: #FDFFE5;
+    border-color: var(--color-ink);
+    box-shadow: 4px 4px 0px var(--color-ink);
+    transform: translateY(-1px);
+}
+
+/* MARQUEE BANNER */
+.marquee-container {
+    background: var(--color-lemon-primary);
+    border-top: var(--border-hard);
+    border-bottom: var(--border-hard);
+    overflow: hidden;
+    white-space: nowrap;
+    padding: 7px 0;
+    font-weight: 800;
+    font-size: 13px;
+    letter-spacing: 0.5px;
+    display: flex;
+}
+
+.marquee-content {
+    display: inline-flex;
+    gap: 2rem;
+    animation: marquee-scroll 24s linear infinite;
+}
+
+@keyframes marquee-scroll {
+    0% { transform: translateX(0); }
+    100% { transform: translateX(-50%); }
+}
+
+/* SHUFFLE & REVEAL ANIMATIONS */
+@keyframes cardPop {
+    0% {
+        opacity: 0;
+        transform: scale(0.9) translateY(20px);
+    }
+    70% {
+        transform: scale(1.02) translateY(-4px);
+    }
+    100% {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+    }
+}
+
+.animate-card-pop {
+    animation: cardPop 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+}
+
+@keyframes slotSpin {
+    0% { transform: translateY(0); }
+    25% { transform: translateY(-5px); }
+    50% { transform: translateY(5px); }
+    75% { transform: translateY(-3px); }
+    100% { transform: translateY(0); }
+}
+
+.animate-slot-spin {
+    animation: slotSpin 0.15s ease-in-out infinite;
+}
+
+/* SUGGESTION CHIPS (LỜI GỢI Ý CHÚC) */
+.chip-suggestion {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    background: #FFFFFF;
+    border: 1.5px solid var(--color-ink);
+    border-radius: 9999px;
+    padding: 6px 14px;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--color-ink);
+    cursor: pointer;
+    box-shadow: 2px 2px 0px var(--color-ink);
+    transition: all 0.12s ease;
+    user-select: none;
+}
+
+.chip-suggestion:hover {
+    background: var(--color-lemon-bright);
+    transform: translateY(-2px);
+    box-shadow: 3px 3px 0px var(--color-ink);
+}
+
+.chip-suggestion:active {
+    transform: translateY(1px);
+    box-shadow: 1px 1px 0px var(--color-ink);
+}
+
+/* CONFETTI CANVAS */
+#confettiCanvas {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    pointer-events: none;
+    z-index: 9999;
+}
+
+/* FLOATING STICKERS */
+.sticker-float-1 {
+    animation: stickerFloat1 5s ease-in-out infinite;
+}
+
+.sticker-float-2 {
+    animation: stickerFloat2 6s ease-in-out infinite;
+}
+
+@keyframes stickerFloat1 {
+    0%, 100% { transform: translateY(0px) rotate(4deg); }
+    50% { transform: translateY(-8px) rotate(-2deg); }
+}
+
+@keyframes stickerFloat2 {
+    0%, 100% { transform: translateY(0px) rotate(-6deg); }
+    50% { transform: translateY(-10px) rotate(1deg); }
+}
+
+/* RESPONSIVE DESIGN TWEAKS */
+@media (max-width: 640px) {
+    :root {
+        --shadow-pop: 4px 4px 0px var(--color-ink);
+        --shadow-pop-lg: 5px 5px 0px var(--color-ink);
+    }
+    .washi-tape-top {
+        width: 100px;
+        height: 20px;
+    }
+}
+
+
+/* ==========================================================================
+   HỘP QUÀ BÍ ẨN (bước bốc thăm)
+   ========================================================================== */
+.gift-scene {
+    position: relative;
+    height: 400px;
+    max-width: 360px;
+    margin: 0 auto;
+}
+
+.gift-box {
+    position: absolute;
+    left: 50%;
+    bottom: 8px;
+    width: 150px;
+    height: 140px;
+    margin-left: -75px;
+    padding: 0;
+    border: 0;
+    background: none;
+    cursor: pointer;
+    z-index: 2;
+    transform-origin: 50% 100%;
+    animation: giftIdle 2.4s ease-in-out infinite;
+    -webkit-tap-highlight-color: transparent;
+}
+
+.gift-box:focus-visible {
+    outline: 3px dashed var(--color-ink);
+    outline-offset: 10px;
+    border-radius: 12px;
+}
+
+.gift-body {
+    position: absolute;
+    left: 8px;
+    right: 8px;
+    bottom: 0;
+    height: 92px;
+    display: block;
+    overflow: hidden;
+    background: var(--color-event-green-light);
+    border: var(--border-hard);
+    border-radius: 0 0 10px 10px;
+    box-shadow: var(--shadow-pop);
+}
+
+.gift-ribbon-v,
+.gift-lid-ribbon {
+    position: absolute;
+    left: 50%;
+    top: 0;
+    bottom: 0;
+    width: 26px;
+    margin-left: -13px;
+    background: var(--color-lemon-primary);
+    border-left: var(--border-thin);
+    border-right: var(--border-thin);
+}
+
+.gift-q {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: 46px;
+    height: 46px;
+    margin: -23px 0 0 -23px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    background: #FFFFFF;
+    border: 2.5px solid var(--color-ink);
+    font-weight: 900;
+    font-size: 26px;
+    color: var(--color-ink);
+}
+
+.gift-lid {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 0;
+    height: 52px;
+    display: block;
+    background: var(--color-event-green);
+    border: var(--border-hard);
+    border-radius: 10px;
+    box-shadow: var(--shadow-pop-sm);
+    transform-origin: 0% 100%;
+    transition: transform 0.75s cubic-bezier(0.2, 1.3, 0.4, 1), opacity 0.6s ease 0.15s;
+}
+
+.gift-lid-ribbon {
+    border-top: 0;
+    border-bottom: 0;
+}
+
+.gift-bow {
+    position: absolute;
+    left: 50%;
+    top: -30px;
+    transform: translateX(-50%);
+    font-size: 40px;
+    line-height: 1;
+}
+
+.gift-box.is-shaking {
+    animation: giftShakeHard 0.12s linear infinite;
+}
+
+.gift-box.is-open {
+    animation: giftSquash 0.5s ease-out 1 forwards;
+    cursor: default;
+}
+
+.gift-box.is-open .gift-lid {
+    transform: translate(-90px, -170px) rotate(-42deg);
+    opacity: 0;
+}
+
+.gift-box.is-open .gift-q {
+    display: none;
+}
+
+/* Thẻ người nhận bật ra từ trong hộp */
+.gift-reveal {
+    position: absolute;
+    left: 50%;
+    bottom: 112px;
+    width: min(320px, 94%);
+    padding: 16px 14px;
+    z-index: 1;
+    opacity: 0;
+    pointer-events: none;
+    transform: translate(-50%, 110px) scale(0.25);
+    transition: transform 0.9s cubic-bezier(0.2, 1.5, 0.35, 1), opacity 0.25s ease;
+}
+
+.gift-reveal.is-revealed {
+    opacity: 1;
+    transform: translate(-50%, 0) scale(1);
+}
+
+/* Vệt sáng lóe lên khi mở nắp */
+.gift-flash {
+    position: absolute;
+    left: 50%;
+    bottom: 70px;
+    width: 120px;
+    height: 120px;
+    margin-left: -60px;
+    border-radius: 50%;
+    background: radial-gradient(circle, #FFFFFF 0%, var(--color-lemon-bright) 45%, rgba(247, 254, 69, 0) 72%);
+    opacity: 0;
+    pointer-events: none;
+    z-index: 0;
+}
+
+.gift-flash.go {
+    animation: giftFlash 0.9s ease-out 1;
+}
+
+@keyframes giftIdle {
+    0%, 62%, 100% { transform: translateY(0) rotate(0deg); }
+    68% { transform: translateY(-8px) rotate(-5deg); }
+    74% { transform: translateY(0) rotate(5deg); }
+    80% { transform: translateY(-5px) rotate(-4deg); }
+    86% { transform: translateY(0) rotate(3deg); }
+    92% { transform: translateY(0) rotate(-1.5deg); }
+}
+
+@keyframes giftShakeHard {
+    0% { transform: translate(0, 0) rotate(0deg); }
+    25% { transform: translate(-5px, -2px) rotate(-7deg); }
+    50% { transform: translate(0, 2px) rotate(0deg); }
+    75% { transform: translate(5px, -2px) rotate(7deg); }
+    100% { transform: translate(0, 0) rotate(0deg); }
+}
+
+@keyframes giftSquash {
+    0% { transform: scale(1, 1); }
+    25% { transform: scale(1.12, 0.82); }
+    60% { transform: scale(0.95, 1.08); }
+    100% { transform: scale(1, 1); }
+}
+
+@keyframes giftFlash {
+    0% { opacity: 0.95; transform: scale(0.3); }
+    100% { opacity: 0; transform: scale(4.5); }
+}
+
+@media (max-width: 640px) {
+    .gift-scene { height: 380px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .gift-box { animation: none; }
+    .gift-box.is-shaking { animation: none; }
+    .gift-reveal, .gift-lid { transition-duration: 0.01s; }
+}

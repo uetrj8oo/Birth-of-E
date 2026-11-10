@@ -1,0 +1,637 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trao Gửi Lời Chúc Sinh Nhật - Đội Event UIT</title>
+    <meta name="description"
+        content="Hệ thống bốc thăm ngẫu nhiên và gửi lời chúc sinh nhật cho các thành viên Đội Event - Trường Đại học Công nghệ Thông tin, ĐHQG-HCM.">
+
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        lemon: {
+                            DEFAULT: '#F0F638',
+                            bright: '#F7FE45',
+                            soft: '#FCFFE0',
+                            border: '#D8DF12',
+                        },
+                        eventgreen: {
+                            DEFAULT: '#1B5E20',
+                            light: '#2E7D32',
+                            soft: '#DCFCE7',
+                        },
+                        ink: '#18181B',
+                    },
+                    fontFamily: {
+                        sans: ['Lexend', 'Be Vietnam Pro', 'sans-serif'],
+                        display: ['UTM Bitsumishi Pro', 'Lexend', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+
+    <!-- Google Fonts & FontAwesome -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800;900&family=Caveat:wght@600;700&family=Lexend:wght@400;500;600;700;800;900&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+    <!-- Custom Theme Stylesheet -->
+    <link rel="stylesheet" href="style.css">
+    <link rel="icon" type="image/png" href="./assets/images/logo-event-uit.png">
+</head>
+
+<body class="bg-notebook-pattern min-h-screen flex flex-col justify-between selection:bg-lemon selection:text-ink">
+
+    <!-- CANVAS PHÁO HOA GIẤY (CONFETTI) -->
+    <canvas id="confettiCanvas"></canvas>
+
+    <!-- =========================================================================
+         1. TOP NAVIGATION & BRANDING BAR
+         ========================================================================= -->
+    <header class="w-full bg-white border-b-[2.5px] border-ink sticky top-0 z-40 shadow-sm">
+        <div class="max-w-5xl mx-auto px-4 py-3 flex items-center justify-between">
+            <!-- Club Identity & Logo -->
+            <div class="flex items-center gap-3">
+                <div class="relative group cursor-pointer">
+                    <img src="./assets/images/logo-event-uit.png" alt="Logo Đội Event - UIT"
+                        class="w-11 h-11 md:w-12 md:h-12 rounded-full border-2 border-ink shadow-[2px_2px_0px_#18181b] group-hover:rotate-6 transition-transform">
+                </div>
+                <div>
+                    <div class="text-[10px] md:text-xs font-black tracking-wider uppercase text-emerald-800">
+                        ĐHQG-HCM • TRƯỜNG ĐH CÔNG NGHỆ THÔNG TIN
+                    </div>
+                    <h1 class="text-base md:text-xl font-extrabold text-ink leading-tight flex items-center gap-2">
+                        ĐỘI EVENT - UIT
+                        <span
+                            class="text-xs bg-lemon px-2 py-0.5 rounded border border-ink font-bold shadow-[1px_1px_0px_#18181b]">SINCE
+                            2017</span>
+                    </h1>
+                </div>
+            </div>
+
+            <!-- Quick Control Actions -->
+            <div class="flex items-center gap-2 md:gap-3">
+                <!-- Nút Quản Trị Viên (Icon kín đáo, không có chữ) -->
+                <button id="btnOpenAdmin" class="btn-event-secondary text-sm p-2 w-9 h-9 bg-zinc-100 hover:bg-lemon"
+                    title="Quản trị viên">
+                    <i class="fa-solid fa-user-shield text-emerald-700"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- Animated Slogan Marquee -->
+        <div class="marquee-container">
+            <div class="marquee-content">
+                <span>BỐC THĂM SINH NHẬT</span>
+                <span>•</span>
+                <span>BỐC THĂM SINH NHẬT</span>
+                <span>•</span>
+                <span>BỐC THĂM SINH NHẬT</span>
+                <span>•</span>
+                <span>BỐC THĂM SINH NHẬT</span>
+                <span>•</span>
+                <span>BỐC THĂM SINH NHẬT</span>
+                <span>•</span>
+                <span>BỐC THĂM SINH NHẬT</span>
+                <span>•</span>
+                <span>BỐC THĂM SINH NHẬT</span>
+                <span>•</span>
+                <span>BỐC THĂM SINH NHẬT</span>
+            </div>
+        </div>
+    </header>
+
+    <!-- =========================================================================
+         2. MAIN CONTENT CONTAINER
+         ========================================================================= -->
+    <main class="max-w-3xl mx-auto px-4 py-8 md:py-12 w-full flex-1 flex flex-col justify-center relative">
+
+        <!-- DECORATIVE STICKERS TRANG TRÍ THỦ CÔNG (AUTHENTIC HUMAN TOUCH) -->
+        <div class="hidden lg:block absolute -left-16 top-16 sticker-float-1 pointer-events-none select-none">
+            <div class="postal-stamp bg-yellow-100 border-yellow-500 text-yellow-900 shadow-sm">
+                <span>EVENT UIT</span>
+                <span class="text-xs font-black">2026</span>
+            </div>
+        </div>
+
+        <!-- =====================================================================
+             BƯỚC 1: NHẬP MÃ SỐ SINH VIÊN BẢN THÂN
+             ===================================================================== -->
+        <section id="stepInputMssv" class="w-full">
+            <div class="card-tactile p-6 md:p-10 relative bg-white">
+                <div class="washi-tape-top"></div>
+
+                <!-- Tiêu đề & Giới thiệu -->
+                <div class="text-center mb-8">
+                    <h2 class="text-2xl md:text-4xl font-black text-ink mb-2">
+                        NHẬP MÃ SỐ SINH VIÊN CỦA BẠN
+                    </h2>
+                    <p class="text-zinc-600 text-sm md:text-base max-w-lg mx-auto">
+                        Nhập Mã số sinh viên của bạn để hệ thống kết nối ngẫu nhiên một thành viên khác trong Đội Event
+                        mà bạn sẽ gửi lời chúc sinh nhật nhé!
+                    </p>
+                </div>
+
+                <!-- Form nhập MSSV -->
+                <div class="max-w-md mx-auto space-y-4">
+                    <div>
+                        <label for="senderMssvInput"
+                            class="block text-xs font-black uppercase tracking-wider text-zinc-700 mb-2">
+                            MÃ SỐ SINH VIÊN CỦA BẠN (8 SỐ):
+                        </label>
+                        <div class="relative">
+                            <span class="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-400 text-lg">
+                                <i class="fa-regular fa-id-card"></i>
+                            </span>
+                            <input type="text" id="senderMssvInput" maxlength="8"
+                                placeholder="Ví dụ: 26520057, 25520450..."
+                                class="input-event pl-12 pr-4 text-center text-lg md:text-xl font-mono tracking-widest font-black uppercase"
+                                autocomplete="off">
+                        </div>
+                    </div>
+
+                    <!-- Khu vực phản hồi tự động khi tìm thấy thành viên -->
+                    <div id="senderFeedbackBox" class="hidden transition-all duration-300"></div>
+
+                    <!-- Nút bấm Bắt đầu bốc thăm -->
+                    <button id="btnStartRandom" disabled class="btn-event-primary w-full py-4 text-lg">
+                        <i class="fa-solid fa-shuffle"></i>
+                        <span>BẮT ĐẦU BỐC THĂM NGAY</span>
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- =====================================================================
+             BƯỚC 2: HIỆU ỨNG BỐC THĂM QUAY THẺ (SLOT SHUFFLE)
+             ===================================================================== -->
+        <section id="stepShuffleTarget" class="w-full hidden">
+            <div class="card-lemon p-6 md:p-10 text-center relative overflow-hidden">
+                <div class="text-xs font-black uppercase tracking-widest text-emerald-950 mb-2">
+                    🎁 HỘP QUÀ BÍ ẨN ĐANG CHỜ BẠN
+                </div>
+                <h3 id="giftTitle" class="text-xl md:text-2xl font-black text-ink mb-2">
+                    CHẠM VÀO HỘP QUÀ ĐỂ MỞ!
+                </h3>
+
+                <div id="giftScene" class="gift-scene">
+                    <span id="giftFlash" class="gift-flash"></span>
+
+                    <!-- Thẻ người nhận: bật ra từ trong hộp -->
+                    <div id="giftReveal" class="gift-reveal card-tactile bg-white">
+                        <div class="text-[11px] font-black uppercase tracking-wider text-emerald-900 mb-1">🎂 NGƯỜI BẠN
+                            SẼ GỬI LỜI CHÚC</div>
+                        <div id="giftRevealName" class="text-2xl md:text-3xl font-black text-ink leading-tight mb-2">...
+                        </div>
+                        <div class="flex flex-wrap items-center justify-center gap-2">
+                            <span id="giftRevealMssv"
+                                class="font-mono font-bold text-xs bg-yellow-50 px-2.5 py-0.5 rounded border border-ink shadow-[1px_1px_0px_#18181b]">MSSV:
+                                --------</span>
+                            <span id="giftRevealDept" class="badge-dept-event">Ban Sự kiện</span>
+                        </div>
+                    </div>
+
+                    <!-- Hộp quà -->
+                    <button id="giftBox" type="button" class="gift-box" aria-label="Mở hộp quà bí ẩn">
+                        <span class="gift-lid"><span class="gift-lid-ribbon"></span><span
+                                class="gift-bow">🎀</span></span>
+                        <span class="gift-body"><span class="gift-ribbon-v"></span><span class="gift-q">?</span></span>
+                    </button>
+                </div>
+                <div id="giftFootnote" class="text-xs font-bold text-zinc-800 mt-3">
+                    Bí mật đang nằm trong hộp... ✨
+                </div>
+            </div>
+        </section>
+
+        <!-- =====================================================================
+             BƯỚC 3: HIỂN THỊ NGƯỜI CẦN CHÚC & KHUNG NHẬP LỜI CHÚC
+             ===================================================================== -->
+        <section id="stepWriteWish" class="w-full hidden">
+            <div class="space-y-6">
+
+                <!-- Thẻ Người Nhận (Màu Vàng Chanh Đội Event) -->
+                <div class="card-lemon p-6 md:p-8 relative">
+                    <div class="flex flex-col sm:flex-row items-center justify-between gap-4">
+                        <div class="flex items-center gap-4 text-center sm:text-left">
+                            <!-- Avatar chữ cái viết tắt -->
+                            <div
+                                class="w-16 h-16 md:w-20 md:h-20 rounded-2xl bg-white border-2 border-ink shadow-[3px_3px_0px_#18181b] flex items-center justify-center font-black text-2xl md:text-3xl text-emerald-900 shrink-0">
+                                <span id="targetAvatarText">EV</span>
+                            </div>
+                            <div>
+                                <div
+                                    class="text-xs font-black uppercase tracking-wider text-emerald-950 flex items-center justify-center sm:justify-start gap-1.5 mb-1">
+                                    <span>🎂 THÀNH VIÊN BẠN SẼ GỬI LỜI CHÚC:</span>
+                                </div>
+                                <h3 id="targetName" class="text-2xl md:text-3xl font-black text-ink leading-tight">
+                                    [Tên người nhận]
+                                </h3>
+                                <div class="flex flex-wrap items-center justify-center sm:justify-start gap-2 mt-2">
+                                    <span
+                                        class="font-mono font-bold text-sm bg-white px-2.5 py-0.5 rounded border border-ink shadow-[1px_1px_0px_#18181b]">
+                                        MSSV: <span id="targetMssv">00000000</span>
+                                    </span>
+                                    <span id="targetDeptBadge" class="badge-dept-event">
+                                        Ban Sự kiện
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Thẻ Nhập Lời Chúc (Phong cách thư tay sinh nhật) -->
+                <div class="card-postit p-6 md:p-8 relative">
+                    <div class="washi-tape-top"></div>
+
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-4">
+                        <label for="wishContentInput"
+                            class="text-base md:text-lg font-black text-ink flex items-center gap-2">
+                            <i class="fa-solid fa-pen-nib text-emerald-700"></i>
+                            LỜI CHÚC SINH NHẬT CỦA BẠN:
+                        </label>
+                        <span id="wordCountBadge"
+                            class="text-xs font-bold font-mono px-2.5 py-1 rounded border border-amber-400 bg-amber-50 text-amber-900 w-fit">
+                            0 chữ
+                        </span>
+                    </div>
+
+                    <!-- Khung Textarea Nhập lời chúc -->
+                    <div class="mb-5">
+                        <textarea id="wishContentInput" rows="6"
+                            placeholder="Hãy viết lời chúc sinh nhật chân thành gửi đến đồng đội (viết dài hay ngắn đều được nhé!)... 💛"
+                            class="input-event font-normal text-base resize-y"></textarea>
+                    </div>
+
+                    <!-- Người gửi lời chúc (Tự động theo tên thành viên) -->
+                    <div
+                        class="mb-6 p-4 bg-yellow-50/90 rounded-xl border border-ink/30 flex items-center justify-between shadow-sm">
+                        <div class="flex items-center gap-2.5">
+                            <i class="fa-solid fa-user-pen text-emerald-700 text-base"></i>
+                            <span class="text-xs font-black uppercase tracking-wider text-zinc-700">Người gửi lời
+                                chúc:</span>
+                        </div>
+                        <span id="senderRealNameDisplay"
+                            class="font-black text-ink text-sm bg-white px-3.5 py-1.5 rounded-lg border border-ink shadow-[2px_2px_0px_#18181b]">
+                            [Tên của bạn]
+                        </span>
+                    </div>
+
+                    <!-- Nút Gửi Lời Chúc -->
+                    <button id="btnSubmitWish" disabled class="btn-event-primary w-full py-4 text-lg">
+                        <i class="fa-solid fa-paper-plane"></i>
+                        <span>GỬI LỜI CHÚC SINH NHẬT 💌</span>
+                    </button>
+
+                    <div class="text-center text-xs text-zinc-500 mt-3">
+                        <i class="fa-solid fa-shield-halved text-emerald-700"></i>
+                        Lời chúc được bảo mật an toàn trong kho dữ liệu, chỉ Quản trị viên BĐH Đội Event mới có quyền
+                        xem để biên tập bài đăng.
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- =====================================================================
+             BƯỚC 4: MÀN HÌNH XÁC NHẬN GỬI THÀNH CÔNG
+             ===================================================================== -->
+        <section id="stepSuccess" class="w-full hidden">
+            <div class="card-tactile p-8 md:p-12 text-center bg-white relative">
+                <div class="washi-tape-top"></div>
+
+                <div
+                    class="w-20 h-20 rounded-full bg-lemon border-2 border-ink shadow-[3px_3px_0px_#18181b] flex items-center justify-center text-4xl mx-auto mb-4 animate-bounce">
+                    🎉
+                </div>
+
+                <div
+                    class="inline-block px-3 py-1 bg-emerald-100 text-emerald-800 border border-emerald-600 rounded-full text-xs font-black uppercase tracking-wider mb-2">
+                    GỬI THÀNH CÔNG RỒI NÈ!
+                </div>
+
+                <h3 class="text-2xl md:text-3xl font-black text-ink mb-2">
+                    CẢM ƠN BẠN ĐÃ SẺ CHIA YÊU THƯƠNG! 💛
+                </h3>
+                <p class="text-zinc-600 text-sm md:text-base max-w-md mx-auto mb-6">
+                    Lời chúc sinh nhật bạn gửi đến <strong id="successReceiverName" class="text-ink">[Tên người
+                        nhận]</strong> đã được lưu trữ an toàn trong kho dữ liệu của BĐH Đội Event.
+                </p>
+
+                <!-- Thẻ tóm tắt nội dung vừa gửi -->
+                <div
+                    class="bg-yellow-50 border-2 border-dashed border-yellow-500 rounded-xl p-5 max-w-lg mx-auto text-left mb-6 shadow-sm">
+                    <div
+                        class="text-xs font-bold text-yellow-800 uppercase tracking-wider mb-1 flex items-center gap-1.5">
+                        <i class="fa-solid fa-envelope-open-text"></i> Xem lại lời chúc bạn vừa gửi:
+                    </div>
+                    <div id="successWishPreview" class="text-zinc-800 text-base italic font-serif my-2 break-words">
+                        "Chúc bạn sinh nhật vui vẻ..."
+                    </div>
+                    <div id="successSenderPreview" class="text-xs font-bold text-zinc-600 text-right">
+                        — Gửi bởi: Bạn
+                    </div>
+                </div>
+
+                <!-- Thông báo hoàn tất gửi -->
+                <div class="flex flex-col sm:flex-row items-center justify-center gap-3">
+                    <div
+                        class="p-3.5 bg-emerald-50 border-2 border-emerald-600 rounded-xl text-emerald-900 text-xs sm:text-sm font-bold flex items-center gap-2 shadow-sm">
+                        <i class="fa-solid fa-circle-check text-emerald-600 text-lg"></i>
+                        <span>Bạn đã hoàn thành việc gửi lời chúc sinh nhật! BĐH Đội Event cảm ơn bạn rất nhiều
+                            💛</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- =========================================================================
+         3. FOOTER BẢN QUYỀN & THÔNG TIN ĐỘI EVENT
+         ========================================================================= -->
+    <footer class="w-full bg-white border-t-[2.5px] border-ink py-6 mt-12">
+        <div
+            class="max-w-5xl mx-auto px-4 flex flex-col md:flex-row items-center justify-between gap-4 text-center md:text-left">
+            <div class="flex items-center gap-3">
+                <img src="./assets/images/logo-event-uit.png" alt="Đội Event UIT"
+                    class="w-9 h-9 rounded-full border border-ink">
+                <div>
+                    <div class="text-xs font-black text-ink">ĐỘI SỰ KIỆN - TRƯỜNG ĐH CÔNG NGHỆ THÔNG TIN (ĐHQG-HCM)
+                    </div>
+                    <div class="text-[11px] text-zinc-500">Event in our heart • Cháy hết mình cùng thanh xuân</div>
+                </div>
+            </div>
+
+            <div class="text-xs text-zinc-500 flex flex-wrap items-center justify-center gap-4">
+                <span>© 2026 Đội Event - UIT</span>
+                <span>•</span>
+                <a href="https://www.facebook.com" target="_blank" rel="noopener"
+                    class="hover:text-emerald-700 font-bold">
+                    <i class="fa-brands fa-facebook"></i> Fanpage Đội Event
+                </a>
+            </div>
+        </div>
+    </footer>
+
+    <!-- =========================================================================
+         4. MODAL QUẢN TRỊ VIÊN (ADMIN DASHBOARD) - BẢO MẬT BẰNG PIN
+         ========================================================================= -->
+    <div id="adminModal"
+        class="fixed inset-0 bg-ink/70 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+        <div
+            class="card-tactile bg-white w-full max-w-4xl max-h-[90vh] flex flex-col overflow-hidden shadow-[8px_8px_0px_#18181b]">
+
+            <!-- Modal Header -->
+            <div class="bg-lemon border-b-2 border-ink p-4 flex items-center justify-between shrink-0">
+                <div class="flex items-center gap-2">
+                    <span
+                        class="w-8 h-8 rounded-lg bg-white border border-ink flex items-center justify-center text-sm font-black shadow-[1px_1px_0px_#18181b]">
+                        🛡️
+                    </span>
+                    <div>
+                        <h4 class="font-black text-base text-ink leading-tight">CỔNG QUẢN TRỊ VIÊN - ĐỘI EVENT UIT</h4>
+                        <div class="text-xs font-bold text-emerald-950">Quản lý kho lời chúc sinh nhật & cấu hình lưu
+                            trữ</div>
+                    </div>
+                </div>
+                <button id="btnCloseAdmin"
+                    class="w-8 h-8 rounded-lg bg-white border border-ink hover:bg-rose-50 text-ink font-bold flex items-center justify-center shadow-[1px_1px_0px_#18181b]">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+
+            <!-- Modal Content Area -->
+            <div class="p-4 md:p-6 overflow-y-auto flex-1">
+
+                <!-- 1. Màn hình Nhập mã PIN bảo mật -->
+                <div id="adminAuthSection" class="max-w-sm mx-auto text-center py-8">
+                    <div class="text-4xl mb-3">🔐</div>
+                    <h5 class="text-lg font-black text-ink mb-1">Xác thực quyền Quản trị viên</h5>
+                    <p class="text-xs text-zinc-600 mb-4">Vui lòng nhập mã PIN quản trị để truy cập dữ liệu các lời chúc
+                        sinh nhật.</p>
+
+                    <div class="space-y-3">
+                        <input type="password" id="adminPinInput" placeholder="Nhập mã PIN..."
+                            class="input-event text-center font-mono text-lg tracking-widest">
+                        <button id="btnVerifyPin" class="btn-event-primary w-full py-2.5 text-sm">
+                            <i class="fa-solid fa-key"></i> Xác Thực & Mở Khóa
+                        </button>
+                        <div class="text-[11px] text-zinc-400">
+                            (Mã PIN mặc định: <span class="font-mono font-bold text-zinc-600">eventuit2026</span> - có
+                            thể đổi trong cài đặt)
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 2. Giao diện Dashboard Quản trị (Sau khi mở khóa) -->
+                <div id="adminDashboardSection" class="hidden space-y-6">
+
+                    <!-- Dashboard Stats Row -->
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                        <div class="p-3 bg-yellow-50 border-2 border-ink rounded-xl shadow-[2px_2px_0px_#18181b]">
+                            <div class="text-xs font-bold text-zinc-500 uppercase">Tổng lời chúc đã nhận</div>
+                            <div id="statTotalWishes" class="text-2xl font-black text-ink mt-0.5">0</div>
+                        </div>
+                        <div class="p-3 bg-emerald-50 border-2 border-ink rounded-xl shadow-[2px_2px_0px_#18181b]">
+                            <div class="text-xs font-bold text-emerald-800 uppercase">Thành viên có lời chúc</div>
+                            <div id="statReceivedMembers" class="text-2xl font-black text-emerald-950 mt-0.5">0/0</div>
+                        </div>
+                        <div class="p-3 bg-rose-50 border-2 border-ink rounded-xl shadow-[2px_2px_0px_#18181b]">
+                            <div class="text-xs font-bold text-rose-800 uppercase">Thành viên chưa có</div>
+                            <div id="statRemainingMembers" class="text-2xl font-black text-rose-950 mt-0.5">0</div>
+                        </div>
+                    </div>
+
+                    <!-- Admin Navigation Tabs -->
+                    <div class="flex items-center gap-2 border-b-2 border-ink pb-2 overflow-x-auto">
+                        <button
+                            class="admin-tab-btn bg-lemon font-black border-2 border-ink px-3 py-1.5 rounded-lg text-xs flex items-center gap-1.5 shadow-[1px_1px_0px_#18181b]"
+                            data-tab="wishes">
+                            <i class="fa-solid fa-envelopes-bulk"></i> Danh sách Lời chúc
+                        </button>
+                        <button
+                            class="admin-tab-btn bg-white font-semibold border-2 border-ink px-3 py-1.5 rounded-lg text-xs flex items-center gap-1.5 shadow-[1px_1px_0px_#18181b]"
+                            data-tab="members">
+                            <i class="fa-solid fa-users"></i> Thành viên (<span id="memberCountTab">0</span>)
+                        </button>
+                        <button
+                            class="admin-tab-btn bg-white font-semibold border-2 border-ink px-3 py-1.5 rounded-lg text-xs flex items-center gap-1.5 shadow-[1px_1px_0px_#18181b]"
+                            data-tab="settings">
+                            <i class="fa-solid fa-sliders"></i> Kết nối Sheets & Bảo mật
+                        </button>
+                    </div>
+
+                    <!-- TAB 1: DANH SÁCH LỜI CHÚC -->
+                    <div id="tabContent-wishes" class="admin-tab-content space-y-4">
+                        <div class="flex flex-col sm:flex-row items-center justify-between gap-3">
+                            <div class="flex items-center gap-2 w-full sm:w-auto">
+                                <input type="text" id="adminSearchInput" placeholder="Tìm theo tên, MSSV, nội dung..."
+                                    class="input-event py-1.5 px-3 text-xs w-full sm:w-64">
+                                <select id="adminStatusFilter" class="input-event py-1.5 px-3 text-xs w-auto">
+                                    <option value="all">Tất cả trạng thái</option>
+                                    <option value="Chưa đăng post">Chưa đăng post</option>
+                                    <option value="Đã đăng post">Đã đăng post</option>
+                                </select>
+                            </div>
+                            <div class="flex items-center gap-2 shrink-0">
+                                <button id="btnExportCsv"
+                                    class="btn-event-secondary text-xs bg-emerald-100 hover:bg-emerald-200 text-emerald-900 border-ink">
+                                    <i class="fa-solid fa-file-excel text-emerald-700"></i> Xuất Excel (.CSV)
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Bảng lời chúc -->
+                        <div class="border-2 border-ink rounded-xl overflow-x-auto bg-white shadow-sm">
+                            <table class="w-full text-left text-xs border-collapse">
+                                <thead class="bg-zinc-100 border-b-2 border-ink text-zinc-700 font-black uppercase">
+                                    <tr>
+                                        <th class="p-3">Thời gian</th>
+                                        <th class="p-3">Người nhận</th>
+                                        <th class="p-3">Người gửi</th>
+                                        <th class="p-3">Nội dung lời chúc</th>
+                                        <th class="p-3 text-center">Trạng thái</th>
+                                        <th class="p-3 text-center">Thao tác</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="adminWishesTableBody">
+                                    <!-- Dynamic rows loaded via app.js -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- TAB 2: QUẢN LÝ THÀNH VIÊN -->
+                    <div id="tabContent-members" class="admin-tab-content hidden space-y-4">
+                        <div class="p-4 bg-zinc-50 border-2 border-ink rounded-xl">
+                            <div class="text-xs font-black uppercase text-zinc-800 mb-2">Thêm thành viên mới vào Đội:
+                            </div>
+                            <div class="grid grid-cols-1 sm:grid-cols-4 gap-2">
+                                <input type="text" id="newMemberMssv" placeholder="MSSV (VD: 26529999)"
+                                    class="input-event py-1.5 text-xs">
+                                <input type="text" id="newMemberName" placeholder="Họ và Tên"
+                                    class="input-event py-1.5 text-xs">
+                                <select id="newMemberDept" class="input-event py-1.5 text-xs">
+                                    <option value="Sự kiện">Ban Sự kiện</option>
+                                    <option value="Truyền thông">Ban Truyền thông</option>
+                                </select>
+                                <button id="btnAddMember" class="btn-event-primary py-1.5 text-xs">
+                                    <i class="fa-solid fa-user-plus"></i> Thêm thành viên
+                                </button>
+                            </div>
+                            <input type="email" id="newMemberEmail" placeholder="Email sinh viên (Tùy chọn)"
+                                class="input-event py-1.5 text-xs mt-2">
+                        </div>
+
+                        <div class="flex items-center justify-between">
+                            <div class="text-xs font-bold text-zinc-600">Danh sách thành viên hiện hành (<span
+                                    id="memberCountCurrent">0</span> bạn):</div>
+                            <button id="btnResetDefaultMembers" class="text-xs text-rose-600 hover:underline font-bold">
+                                <i class="fa-solid fa-rotate-left"></i> Khôi phục danh sách gốc (<span
+                                    id="memberCountReset">0</span> bạn)
+                            </button>
+                        </div>
+
+                        <div class="border-2 border-ink rounded-xl overflow-x-auto bg-white max-h-72">
+                            <table class="w-full text-left text-xs border-collapse">
+                                <thead
+                                    class="bg-zinc-100 border-b-2 border-ink text-zinc-700 font-black uppercase sticky top-0">
+                                    <tr>
+                                        <th class="p-2 text-center">STT</th>
+                                        <th class="p-2">MSSV</th>
+                                        <th class="p-2">Họ và Tên</th>
+                                        <th class="p-2">Phân ban</th>
+                                        <th class="p-2">Email</th>
+                                        <th class="p-2 text-center">Xóa</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="adminMemberListTableBody">
+                                    <!-- Loaded by app.js -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- TAB 3: KẾT NỐI GOOGLE SHEETS & BẢO MẬT -->
+                    <div id="tabContent-settings" class="admin-tab-content hidden space-y-5">
+
+                        <!-- Cấu hình Google Apps Script Web App -->
+                        <div class="p-5 bg-white border-2 border-ink rounded-xl shadow-sm space-y-3">
+                            <div class="flex items-center justify-between">
+                                <h6 class="font-black text-sm text-ink flex items-center gap-2">
+                                    <i class="fa-solid fa-table text-emerald-700 text-base"></i>
+                                    KẾT NỐI LƯU TRỮ VÀO GOOGLE SHEETS TỰ ĐỘNG
+                                </h6>
+                                <span
+                                    class="text-[11px] bg-emerald-100 text-emerald-800 border border-emerald-500 px-2 py-0.5 rounded font-bold">
+                                    Khuyên dùng
+                                </span>
+                            </div>
+                            <p class="text-xs text-zinc-600">
+                                Khi cấu hình URL Google Apps Script Web App, mỗi lời chúc khi gửi sẽ được tự động đồng
+                                bộ tức thì vào bảng tính Google Sheets của bạn. Chỉ tài khoản Google của bạn mới có
+                                quyền xem bảng tính này!
+                            </p>
+                            <div>
+                                <label class="block text-xs font-bold text-zinc-700 mb-1">URL Ứng Dụng Web Google Apps
+                                    Script (Web App URL):</label>
+                                <input type="url" id="settingGoogleUrl"
+                                    placeholder="https://script.google.com/macros/s/.../exec"
+                                    class="input-event py-2 text-xs font-mono">
+                            </div>
+                            <div class="flex flex-wrap items-center gap-2 pt-1">
+                                <button id="btnSaveGoogleUrl" class="btn-event-primary py-2 px-4 text-xs">
+                                    <i class="fa-solid fa-floppy-disk"></i> Lưu URL Webhook
+                                </button>
+                                <button id="btnTestGoogleUrl" class="btn-event-secondary py-2 px-4 text-xs">
+                                    <i class="fa-solid fa-plug"></i> Kiểm tra kết nối
+                                </button>
+                            </div>
+                            <div
+                                class="p-3 bg-yellow-50 border border-yellow-300 rounded-lg text-[11px] text-yellow-900 leading-relaxed">
+                                📌 <strong>File code Apps Script đã tạo sẵn:</strong> Bạn có thể mở file <code
+                                    class="font-mono bg-white px-1 py-0.5 rounded border border-yellow-400">google-apps-script.js</code>
+                                trong thư mục dự án và làm theo hướng dẫn 7 bước (chỉ mất 1 phút) để lấy URL dán vào đây
+                                nhé!
+                            </div>
+                        </div>
+
+                        <!-- Đổi mã PIN bảo mật Admin -->
+                        <div
+                            class="p-5 bg-white border-2 border-ink rounded-xl shadow-sm flex items-center justify-between">
+                            <div>
+                                <h6 class="font-black text-sm text-ink mb-1">Mã PIN Quản trị viên</h6>
+                                <p class="text-xs text-zinc-600">Bảo vệ cổng xem các lời chúc sinh nhật khỏi người
+                                    ngoài.</p>
+                            </div>
+                            <button id="btnChangePin" class="btn-event-secondary text-xs">
+                                <i class="fa-solid fa-key"></i> Đổi Mã PIN
+                            </button>
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- Data & Scripts -->
+    <script src="./data/members.js"></script>
+    <script src="./app.js"></script>
+</body>
+
+</html>
