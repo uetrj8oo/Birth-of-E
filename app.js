@@ -396,39 +396,56 @@ function handleSenderMssvInput(e) {
 // ============================================================================
 // BƯỚC 2: BỐC THĂM NGẪU NHIÊN ĐỒNG ĐỘI CẦN CHÚC
 // ============================================================================
+// ----------------------------------------------------------------------------
+// THUẬT TOÁN CHIA CẶP VÒNG TRÒN (xáo trộn theo hạt giống cố định)
+// Đổi PAIRING_SEED nếu muốn xáo lại toàn bộ cặp. Danh sách thành viên đổi thì cặp cũng đổi.
+// ----------------------------------------------------------------------------
+const PAIRING_SEED = 'EVENT_UIT_BIRTHDAY_2026_2027';
+
+function seededRandom(seedStr) {
+    let h = 1779033703 ^ seedStr.length;
+    for (let i = 0; i < seedStr.length; i++) {
+        h = Math.imul(h ^ seedStr.charCodeAt(i), 3432918353);
+        h = (h << 13) | (h >>> 19);
+    }
+    let a = h >>> 0;
+    return function () {            // mulberry32
+        a = (a + 0x6D2B79F5) >>> 0;
+        let t = a;
+        t = Math.imul(t ^ (t >>> 15), t | 1);
+        t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
+        return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+    };
+}
+
+function getAssignedTarget(senderMssv) {
+    const ids = AppState.members.map(m => m.mssv).sort();   // sắp theo MSSV để không phụ thuộc thứ tự xlsx
+    const rand = seededRandom(PAIRING_SEED + '|' + ids.join(','));
+    for (let i = ids.length - 1; i > 0; i--) {              // Fisher-Yates
+        const j = Math.floor(rand() * (i + 1));
+        [ids[i], ids[j]] = [ids[j], ids[i]];
+    }
+    const idx = ids.indexOf(senderMssv);
+    if (idx === -1) return null;
+    const targetMssv = ids[(idx + 1) % ids.length];         // vòng tròn: người cuối chúc người đầu
+    return AppState.members.find(m => m.mssv === targetMssv) || null;
+}
+
 function handleStartRandomMatching() {
     if (!AppState.currentSender) return;
     playSound('click');
 
-    // Lọc danh sách: BẮT BUỘC KHÔNG ĐƯỢC LÀ CHÍNH MÌNH
-    const validCandidates = AppState.members.filter(m => m.mssv !== AppState.currentSender.mssv);
-
-    if (validCandidates.length === 0) {
+    if (AppState.members.length < 2) {
         alert('Danh sách thành viên không đủ để bốc thăm!');
         return;
     }
 
-    // XÁC ĐỊNH MỤC TIÊU CỐ ĐỊNH (1 người duy nhất, không trùng lặp)
-    let savedPairs = {};
-    try {
-        savedPairs = JSON.parse(localStorage.getItem(STORAGE_KEYS.SAVED_PAIRS) || '{}');
-    } catch (e) {}
-
-    let finalTarget = null;
-    if (savedPairs[AppState.currentSender.mssv]) {
-        const pairedMssv = savedPairs[AppState.currentSender.mssv];
-        finalTarget = AppState.members.find(m => m.mssv === pairedMssv && m.mssv !== AppState.currentSender.mssv);
-    }
-
+    // CHIA CẶP CỐ ĐỊNH THEO VÒNG TRÒN: mọi máy tính ra cùng kết quả,
+    // mỗi người chúc đúng 1 người và nhận đúng 1 lời chúc, không bao giờ trúng chính mình.
+    const finalTarget = getAssignedTarget(AppState.currentSender.mssv);
     if (!finalTarget) {
-        // Ưu tiên các bạn chưa nhận được lời chúc nào để ai cũng có lời chúc sinh nhật
-        const receivedMssvs = new Set(AppState.wishes.map(w => w.receiver_mssv));
-        const notYetReceived = validCandidates.filter(c => !receivedMssvs.has(c.mssv));
-        const candidatePool = notYetReceived.length > 0 ? notYetReceived : validCandidates;
-
-        finalTarget = candidatePool[Math.floor(Math.random() * candidatePool.length)];
-        savedPairs[AppState.currentSender.mssv] = finalTarget.mssv;
-        localStorage.setItem(STORAGE_KEYS.SAVED_PAIRS, JSON.stringify(savedPairs));
+        alert('Không tìm thấy cặp bốc thăm cho MSSV này. Vui lòng liên hệ BĐH Đội Event!');
+        return;
     }
 
     AppState.currentTarget = finalTarget;
