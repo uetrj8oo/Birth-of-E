@@ -1,4 +1,4 @@
-﻿// DANH SÁCH 60 THÀNH VIÊN - ĐỘI EVENT UIT (NHIỆM KỲ 2026 - 2027)
+// DANH SÁCH 60 THÀNH VIÊN - ĐỘI EVENT UIT (NHIỆM KỲ 2026 - 2027)
 // TỰ SINH TỪ FILE XLSX bằng sync-members.py - MSSV lấy theo file xlsx, đừng sửa tay.
 const DEFAULT_MEMBERS = [
     { stt: 1, name: "Trần Ngọc Bảo Huy", birthday: "02/01/2006", month: "THÁNG 1", mssv: "24520702", dept: "Sự kiện" },
@@ -63,8 +63,8 @@ const DEFAULT_MEMBERS = [
     { stt: 60, name: "Trần Hoàng Ngọc Lan", birthday: "30/12/2006", month: "THÁNG 12", mssv: "24520944", dept: "Sự kiện" }
 ];
 
-// Khóa lưu trữ trình duyệt: đổi V3 để bỏ dữ liệu cũ (thiếu MSSV) đã cache trong localStorage
-const MEMBERS_STORAGE_KEY = 'EVENT_UIT_MEMBERS_V3';
+// Khóa cache trình duyệt tự đổi mỗi khi danh sách xlsx đổi -> không bao giờ dùng nhầm bản cũ
+const MEMBERS_STORAGE_KEY = 'EVENT_UIT_MEMBERS_4c034432';
 
 function getMemberList() {
     try {

@@ -2,172 +2,165 @@
  * ============================================================================
  * GOOGLE APPS SCRIPT - LƯU TRỮ LỜI CHÚC SINH NHẬT ĐỘI EVENT - UIT
  * ============================================================================
- * 
- * HƯỚNG DẪN CÀI ĐẶT NHANH TRONG 1 PHÚT:
- * 1. Mở https://sheets.google.com -> Tạo một bảng tính Google Sheets mới (Đặt tên: "LỜI CHÚC SINH NHẬT - ĐỘI EVENT UIT").
- * 2. Trên thanh menu, chọn: Tiện ích mở rộng (Extensions) -> Apps Script.
- * 3. Xóa hết code mặc định trong file Code.gs và dán toàn bộ đoạn mã bên dưới vào.
- * 4. Nhấn nút "Lưu" (biểu tượng đĩa mềm hoặc Ctrl + S).
- * 5. Nhấn nút "Triển khai" (Deploy) màu xanh ở góc trên bên phải -> Chọn "Tùy chọn triển khai mới" (New deployment).
- *    - Loại triển khai: Chọn "Ứng dụng web" (Web app).
- *    - Mô tả: "Event UIT Birthday Webhook".
- *    - Thực thi dưới dạng (Execute as): "Tôi" (Me / your-email@gmail.com).
- *    - Ai có quyền truy cập (Who has access): "Bất kỳ ai" (Anyone).
- * 6. Nhấn "Triển khai" -> Cấp quyền truy cập Google Account khi được hỏi.
- * 7. Sao chép "URL ứng dụng web" (Web App URL có dạng: https://script.google.com/macros/s/.../exec)
- *    và dán vào phần "Cài đặt Quản trị viên" trên website là xong!
+ * Thứ tự cột trong Google Sheet:
+ *   A Thời gian gửi | B MSSV người gửi | C Họ tên người gửi | D MSSV người nhận
+ *   E Họ tên người nhận | F Phân ban người nhận (thả xuống: xanh lá / xanh dương)
+ *   G Ngày sinh người nhận | H Nội dung lời chúc
+ *
+ * CÀI ĐẶT:
+ * 1. Mở Google Sheets mới -> Tiện ích mở rộng (Extensions) -> Apps Script.
+ * 2. Xóa code mặc định, dán toàn bộ file này vào, bấm Lưu (Ctrl + S).
+ * 3. Triển khai (Deploy) -> Tùy chọn triển khai mới -> loại "Ứng dụng web":
+ *      Thực thi dưới dạng: Tôi | Ai có quyền truy cập: Bất kỳ ai.
+ * 4. Dán "URL ứng dụng web" (đuôi /exec) vào Cổng Quản Trị trên website.
+ *
+ * ĐÃ DEPLOY TỪ TRƯỚC? Dán code mới -> Triển khai -> Quản lý bản triển khai ->
+ * bấm biểu tượng bút chì -> Phiên bản: "Phiên bản mới" -> Triển khai.
+ * (URL giữ nguyên, không cần dán lại vào website.)
  * ============================================================================
  */
 
-// Đặt mật khẩu bí mật nếu muốn Admin đọc dữ liệu trực tiếp qua API (Tùy chọn)
 const ADMIN_API_KEY = "eventuit2026";
+const SHEET_NAME = "Lời Chúc";
+const HEADERS = [
+  "Thời Gian Gửi",
+  "MSSV Người Gửi",
+  "Họ Tên Người Gửi",
+  "MSSV Người Nhận",
+  "Họ Tên Người Nhận",
+  "Phân Ban Người Nhận",
+  "Ngày Sinh Người Nhận",
+  "Nội Dung Lời Chúc"
+];
+const DEPT_LIST = ["Sự kiện", "Truyền thông"];
+const MAX_ROWS = 1000;
+
+// Tạo (hoặc dựng lại) sheet đúng định dạng. Có thể chạy tay hàm này 1 lần để kiểm tra.
+function getOrCreateSheet() {
+  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  let sheet = ss.getSheetByName(SHEET_NAME);
+
+  // Sheet cũ (bố cục cũ có cột "Trạng Thái Đăng Post") -> đổi tên giữ lại, tạo sheet mới
+  if (sheet) {
+    const first = sheet.getRange(1, 1, 1, 2).getValues()[0];
+    if (first[0] !== HEADERS[0] || first[1] !== HEADERS[1]) {
+      sheet.setName(SHEET_NAME + " (cũ " + Utilities.formatDate(new Date(), "Asia/Ho_Chi_Minh", "dd-MM-yyyy HH.mm") + ")");
+      sheet = null;
+    }
+  }
+  if (sheet) return sheet;
+
+  sheet = ss.insertSheet(SHEET_NAME);
+  sheet.appendRow(HEADERS);
+
+  const headerRange = sheet.getRange(1, 1, 1, HEADERS.length);
+  headerRange.setBackground("#E8FF3B").setFontColor("#18181B").setFontWeight("bold")
+    .setHorizontalAlignment("center").setVerticalAlignment("middle").setWrap(true);
+  sheet.setRowHeight(1, 38);
+  sheet.setFrozenRows(1);
+
+  [160, 120, 180, 120, 180, 150, 150, 450].forEach((w, i) => sheet.setColumnWidth(i + 1, w));
+
+  // MSSV + ngày sinh lưu dạng văn bản (giữ nguyên số 0, không bị đổi thành ngày)
+  sheet.getRange(2, 2, MAX_ROWS, 1).setNumberFormat("@");
+  sheet.getRange(2, 4, MAX_ROWS, 1).setNumberFormat("@");
+  sheet.getRange(2, 7, MAX_ROWS, 1).setNumberFormat("@");
+  sheet.getRange(2, 8, MAX_ROWS, 1).setWrap(true);
+  sheet.getRange(2, 1, MAX_ROWS, HEADERS.length).setVerticalAlignment("middle");
+
+  // Cột F: danh sách thả xuống
+  const deptRange = sheet.getRange(2, 6, MAX_ROWS, 1);
+  deptRange.setDataValidation(
+    SpreadsheetApp.newDataValidation().requireValueInList(DEPT_LIST, true).setAllowInvalid(true).build()
+  );
+  deptRange.setFontWeight("bold").setHorizontalAlignment("center");
+
+  // Tô màu: Sự kiện = xanh lá, Truyền thông = xanh dương
+  sheet.setConditionalFormatRules([
+    SpreadsheetApp.newConditionalFormatRule().whenTextEqualTo(DEPT_LIST[0])
+      .setBackground("#DCFCE7").setFontColor("#14532D").setRanges([deptRange]).build(),
+    SpreadsheetApp.newConditionalFormatRule().whenTextEqualTo(DEPT_LIST[1])
+      .setBackground("#E0F2FE").setFontColor("#075985").setRanges([deptRange]).build()
+  ]);
+
+  return sheet;
+}
 
 function doPost(e) {
   try {
-    const ss = SpreadsheetApp.getActiveSpreadsheet();
-    let sheet = ss.getSheetByName("Lời Chúc");
-    
-    // Nếu sheet chưa tồn tại thì tạo mới và tạo hàng tiêu đề chuẩn
-    if (!sheet) {
-      sheet = ss.insertSheet("Lời Chúc");
-      const headers = [
-        "Thời Gian Gửi",
-        "MSSV Người Nhận",
-        "Họ Tên Người Nhận",
-        "Phân Ban Người Nhận",
-        "MSSV Người Gửi",
-        "Họ Tên Người Gửi",
-        "Tên Hiển Thị (Ẩn Danh)",
-        "Nội Dung Lời Chúc Sinh Nhật",
-        "Trạng Thái Đăng Post"
-      ];
-      sheet.appendRow(headers);
-      
-      // Định dạng thanh tiêu đề chuẩn màu Vàng Chanh Đội Event
-      const headerRange = sheet.getRange(1, 1, 1, headers.length);
-      headerRange.setBackground("#E8FF3B"); // Màu vàng chanh Event
-      headerRange.setFontColor("#18181B");
-      headerRange.setFontWeight("bold");
-      headerRange.setHorizontalAlignment("center");
-      headerRange.setVerticalAlignment("middle");
-      sheet.setRowHeight(1, 38);
-      
-      sheet.setColumnWidth(1, 160); // Thời gian
-      sheet.setColumnWidth(2, 120); // MSSV nhận
-      sheet.setColumnWidth(3, 180); // Tên nhận
-      sheet.setColumnWidth(4, 140); // Ban
-      sheet.setColumnWidth(5, 120); // MSSV gửi
-      sheet.setColumnWidth(6, 180); // Tên gửi
-      sheet.setColumnWidth(7, 160); // Tên hiển thị
-      sheet.setColumnWidth(8, 450); // Nội dung lời chúc
-      sheet.setColumnWidth(9, 140); // Trạng thái
-    }
-    
-    // Parse dữ liệu gửi lên (hỗ trợ cả JSON body và URL-encoded form data)
+    const sheet = getOrCreateSheet();
+
     let data;
     if (e.postData && e.postData.contents) {
-      try {
-        data = JSON.parse(e.postData.contents);
-      } catch (err) {
-        data = e.parameter;
-      }
+      try { data = JSON.parse(e.postData.contents); } catch (err) { data = e.parameter; }
     } else {
       data = e.parameter;
     }
-    
+
     const timestamp = data.timestamp || Utilities.formatDate(new Date(), "Asia/Ho_Chi_Minh", "dd/MM/yyyy HH:mm:ss");
-    const receiverMssv = data.receiver_mssv || "";
+    const senderMssv = String(data.sender_mssv || "");
+    const senderName = data.sender_name || "";
+    const receiverMssv = String(data.receiver_mssv || "");
     const receiverName = data.receiver_name || "";
     const receiverDept = data.receiver_dept || "";
-    const senderMssv = data.sender_mssv || "";
-    const senderName = data.sender_name || "";
-    const senderDisplay = data.sender_display || (data.is_anonymous ? "Ẩn danh (Bí mật 🤫)" : senderName);
+    const receiverBirthday = String(data.receiver_birthday || "");
     const wishContent = data.wish_content || "";
-    const status = data.status || "Chưa đăng post";
-    
+
     if (!wishContent || !receiverMssv) {
-      return ContentService.createTextOutput(JSON.stringify({
-        status: "error",
-        message: "Thiếu thông tin người nhận hoặc nội dung lời chúc"
-      })).setMimeType(ContentService.MimeType.JSON);
+      return json({ status: "error", message: "Thiếu thông tin người nhận hoặc nội dung lời chúc" });
     }
-    
-    // Thêm hàng mới
-    sheet.appendRow([
-      timestamp,
-      "'" + receiverMssv, // Dấu nháy đơn để giữ đúng số 0 ở đầu nếu có
-      receiverName,
-      receiverDept,
-      "'" + senderMssv,
-      senderName,
-      senderDisplay,
-      wishContent,
-      status
-    ]);
-    
-    // Canh chỉnh hàng mới
-    const lastRow = sheet.getLastRow();
-    sheet.getRange(lastRow, 1, 1, 9).setVerticalAlignment("middle");
-    sheet.getRange(lastRow, 8).setWrap(true); // Tự động xuống dòng cho lời chúc dài
-    
-    return ContentService.createTextOutput(JSON.stringify({
-      status: "success",
-      message: "Lời chúc đã được lưu thành công vào Google Sheet!",
-      row: lastRow
-    })).setMimeType(ContentService.MimeType.JSON);
-    
+
+    // Ghi ngay dưới dòng cuối có dữ liệu (cột A) để không lệch vùng đã định dạng sẵn
+    const row = Math.max(sheet.getLastRow(), 1) + 1;
+    sheet.getRange(row, 1, 1, HEADERS.length).setValues([[
+      timestamp, senderMssv, senderName, receiverMssv, receiverName, receiverDept, receiverBirthday, wishContent
+    ]]);
+
+    return json({ status: "success", message: "Lời chúc đã được lưu vào Google Sheet!", row: row });
   } catch (error) {
-    return ContentService.createTextOutput(JSON.stringify({
-      status: "error",
-      message: error.toString()
-    })).setMimeType(ContentService.MimeType.JSON);
+    return json({ status: "error", message: error.toString() });
   }
 }
 
 function doGet(e) {
   const params = e ? e.parameter : {};
-  
-  // Kiểm tra nếu admin yêu cầu lấy danh sách lời chúc
+
   if (params && params.action === "get_wishes" && params.key === ADMIN_API_KEY) {
     try {
-      const ss = SpreadsheetApp.getActiveSpreadsheet();
-      const sheet = ss.getSheetByName("Lời Chúc");
-      if (!sheet) {
-        return ContentService.createTextOutput(JSON.stringify({ status: "success", wishes: [] }))
-          .setMimeType(ContentService.MimeType.JSON);
-      }
-      
+      const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(SHEET_NAME);
+      if (!sheet) return json({ status: "success", wishes: [] });
+
       const values = sheet.getDataRange().getValues();
       const wishes = [];
       for (let i = 1; i < values.length; i++) {
-        const row = values[i];
+        const r = values[i];
+        if (!r[7]) continue;
         wishes.push({
           id: i,
-          timestamp: row[0],
-          receiver_mssv: String(row[1]).replace(/^'/, ''),
-          receiver_name: row[2],
-          receiver_dept: row[3],
-          sender_mssv: String(row[4]).replace(/^'/, ''),
-          sender_name: row[5],
-          sender_display: row[6],
-          wish_content: row[7],
-          status: row[8]
+          timestamp: r[0],
+          sender_mssv: String(r[1]),
+          sender_name: r[2],
+          receiver_mssv: String(r[3]),
+          receiver_name: r[4],
+          receiver_dept: r[5],
+          receiver_birthday: String(r[6]),
+          wish_content: r[7]
         });
       }
-      
-      return ContentService.createTextOutput(JSON.stringify({ status: "success", wishes: wishes }))
-        .setMimeType(ContentService.MimeType.JSON);
+      return json({ status: "success", wishes: wishes });
     } catch (err) {
-      return ContentService.createTextOutput(JSON.stringify({ status: "error", message: err.toString() }))
-        .setMimeType(ContentService.MimeType.JSON);
+      return json({ status: "error", message: err.toString() });
     }
   }
-  
-  // Mặc định trả về thông báo hệ thống hoạt động
-  return ContentService.createTextOutput(JSON.stringify({
+
+  return json({
     status: "active",
     club: "ĐỘI EVENT - TRƯỜNG ĐH CÔNG NGHỆ THÔNG TIN (UIT)",
     service: "Hệ thống Tiếp Nhận Lời Chúc Sinh Nhật Thành Viên",
     time: new Date().toISOString()
-  })).setMimeType(ContentService.MimeType.JSON);
+  });
+}
+
+function json(obj) {
+  return ContentService.createTextOutput(JSON.stringify(obj)).setMimeType(ContentService.MimeType.JSON);
 }

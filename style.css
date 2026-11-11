@@ -423,7 +423,7 @@ html, body {
    ========================================================================== */
 .gift-scene {
     position: relative;
-    height: 400px;
+    height: 430px;
     max-width: 360px;
     margin: 0 auto;
 }
@@ -611,7 +611,7 @@ html, body {
 }
 
 @media (max-width: 640px) {
-    .gift-scene { height: 380px; }
+    .gift-scene { height: 410px; }
 }
 
 @media (prefers-reduced-motion: reduce) {

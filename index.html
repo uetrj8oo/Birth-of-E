@@ -136,10 +136,6 @@
                     <h2 class="text-2xl md:text-4xl font-black text-ink mb-2">
                         NHẬP MÃ SỐ SINH VIÊN CỦA BẠN
                     </h2>
-                    <p class="text-zinc-600 text-sm md:text-base max-w-lg mx-auto">
-                        Nhập Mã số sinh viên của bạn để hệ thống kết nối ngẫu nhiên một thành viên khác trong Đội Event
-                        mà bạn sẽ gửi lời chúc sinh nhật nhé!
-                    </p>
                 </div>
 
                 <!-- Form nhập MSSV -->
@@ -199,6 +195,9 @@
                                 --------</span>
                             <span id="giftRevealDept" class="badge-dept-event">Ban Sự kiện</span>
                         </div>
+                        <div class="mt-2 text-sm font-bold text-zinc-800">
+                            🎂 Sinh nhật: <span id="giftRevealBirthday">--/--/----</span>
+                        </div>
                     </div>
 
                     <!-- Hộp quà -->
@@ -211,6 +210,10 @@
                 <div id="giftFootnote" class="text-xs font-bold text-zinc-800 mt-3">
                     Bí mật đang nằm trong hộp... ✨
                 </div>
+                <button id="btnGiftNext" type="button" class="btn-event-primary hidden mt-3 px-6 py-3">
+                    <i class="fa-solid fa-pen-nib"></i>
+                    <span>VIẾT LỜI CHÚC NGAY</span>
+                </button>
             </div>
         </section>
 
@@ -245,6 +248,10 @@
                                     <span id="targetDeptBadge" class="badge-dept-event">
                                         Ban Sự kiện
                                     </span>
+                                    <span
+                                        class="font-bold text-sm bg-white px-2.5 py-0.5 rounded border border-ink shadow-[1px_1px_0px_#18181b]">
+                                        🎂 <span id="targetBirthday">--/--/----</span>
+                                    </span>
                                 </div>
                             </div>
                         </div>
@@ -270,7 +277,7 @@
                     <!-- Khung Textarea Nhập lời chúc -->
                     <div class="mb-5">
                         <textarea id="wishContentInput" rows="6"
-                            placeholder="Hãy viết lời chúc sinh nhật chân thành gửi đến đồng đội (viết dài hay ngắn đều được nhé!)... 💛"
+                            placeholder="Hãy viết lời chúc sinh nhật chân thành gửi đến đồng đội 💛"
                             class="input-event font-normal text-base resize-y"></textarea>
                     </div>
 
@@ -296,8 +303,7 @@
 
                     <div class="text-center text-xs text-zinc-500 mt-3">
                         <i class="fa-solid fa-shield-halved text-emerald-700"></i>
-                        Lời chúc được bảo mật an toàn trong kho dữ liệu, chỉ Quản trị viên BĐH Đội Event mới có quyền
-                        xem để biên tập bài đăng.
+                        Lời chúc sẽ được dùng để đăng bài chúc mừng sinh nhật thành viên.
                     </div>
                 </div>
 

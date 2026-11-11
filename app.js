@@ -443,7 +443,7 @@ const REDUCED_MOTION = window.matchMedia && window.matchMedia('(prefers-reduced-
 
 let giftTimers = [];
 let giftCountdown = null;
-const GIFT_AUTO_OPEN_MS = 1500;   // chờ trước khi hộp tự mở
+const GIFT_AUTO_OPEN_MS = 4000;   // bấm vào hộp để mở ngay, không bấm thì 4s sau hộp tự mở
 const GIFT_AUTO_NEXT_SEC = 7;     // sau khi mở xong, tự chuyển sang trang lời chúc
 
 function showGiftBox(target) {
@@ -464,16 +464,20 @@ function showGiftBox(target) {
     document.getElementById('giftTitle').innerText = 'HỘP QUÀ BÍ ẨN SẮP MỞ RA... 🤫';
     document.getElementById('giftFootnote').innerText = 'Bí mật đang nằm trong hộp... ✨';
     document.getElementById('giftFootnote').classList.remove('hidden');
+    document.getElementById('btnGiftNext').classList.add('hidden');
 
     // Điền sẵn thông tin người nhận (đang ẩn trong hộp)
     document.getElementById('giftRevealName').innerText = target.name;
     document.getElementById('giftRevealMssv').innerText = `MSSV: ${target.mssv}`;
+    document.getElementById('giftRevealBirthday').innerText = target.birthday || '—';
     const deptEl = document.getElementById('giftRevealDept');
     deptEl.innerText = `Ban ${target.dept}`;
     deptEl.className = target.dept === 'Sự kiện' ? 'badge-dept-event' : 'badge-dept-media';
 
-    box.onclick = null;
-    box.style.cursor = 'default';
+    // Bấm vào hộp để mở ngay (nếu không bấm thì hộp tự mở sau ít giây)
+    box.onclick = () => openGiftBox(target);
+    box.style.cursor = 'pointer';
+    document.getElementById('giftTitle').innerText = 'CHẠM VÀO HỘP QUÀ ĐỂ MỞ! 🎁';
 
     // Dọn bộ hẹn giờ cũ (nếu bốc lại)
     giftTimers.forEach(clearTimeout);
@@ -490,6 +494,10 @@ function openGiftBox(target) {
     const box = document.getElementById('giftBox');
     if (box.dataset.opened === '1') return;
     box.dataset.opened = '1';
+    box.onclick = null;
+    box.style.cursor = 'default';
+    giftTimers.forEach(clearTimeout);   // huỷ hẹn giờ tự mở nếu người dùng đã bấm
+    giftTimers = [];
 
     const reveal = document.getElementById('giftReveal');
     const title = document.getElementById('giftTitle');
@@ -536,9 +544,12 @@ function openGiftBox(target) {
         }
 
         // 6) Đếm ngược rồi tự chuyển sang trang viết lời chúc
+        const btnNext = document.getElementById('btnGiftNext');
+        btnNext.classList.remove('hidden');
+        btnNext.onclick = () => { playSound('click'); finishMatching(target); };
         let left = GIFT_AUTO_NEXT_SEC;
         const tick = () => {
-            footnote.innerText = `Tự động chuyển sang viết lời chúc sau ${left}s... 💌`;
+            footnote.innerText = `Tự động chuyển sang viết lời chúc sau ${left}s (hoặc bấm nút bên dưới) 💌`;
         };
         tick();
         clearInterval(giftCountdown);
@@ -697,6 +708,9 @@ function fxFrame() {
 }
 
 function finishMatching(target) {
+    giftTimers.forEach(clearTimeout);
+    giftTimers = [];
+    clearInterval(giftCountdown);
     // Chuyển sang Bước 3: Hiện thẻ người nhận và Khung nhập lời chúc
     document.getElementById('stepShuffleTarget').classList.add('hidden');
     renderWishWritingStep(target);
@@ -711,6 +725,7 @@ function renderWishWritingStep(target) {
     // Đổ thông tin người nhận vào thẻ
     document.getElementById('targetName').innerText = target.name;
     document.getElementById('targetMssv').innerText = target.mssv;
+    document.getElementById('targetBirthday').innerText = target.birthday || '—';
     
     const targetDeptBadge = document.getElementById('targetDeptBadge');
     targetDeptBadge.innerText = `Ban ${target.dept}`;
@@ -796,6 +811,7 @@ async function handleSubmitWish() {
         receiver_mssv: AppState.currentTarget.mssv,
         receiver_name: AppState.currentTarget.name,
         receiver_dept: AppState.currentTarget.dept,
+        receiver_birthday: AppState.currentTarget.birthday || '',
         sender_mssv: AppState.currentSender.mssv,
         sender_name: AppState.currentSender.name,
         sender_display: senderDisplay,
@@ -826,14 +842,13 @@ function sendWishToGoogleSheets(wish) {
     try {
         const payload = {
             timestamp: wish.timestamp,
+            sender_mssv: wish.sender_mssv,
+            sender_name: wish.sender_name,
             receiver_mssv: wish.receiver_mssv,
             receiver_name: wish.receiver_name,
             receiver_dept: wish.receiver_dept,
-            sender_mssv: wish.sender_mssv,
-            sender_name: wish.sender_name,
-            sender_display: wish.sender_display,
-            wish_content: wish.wish_content,
-            status: wish.status
+            receiver_birthday: wish.receiver_birthday || '',
+            wish_content: wish.wish_content
         };
 
         // Gửi qua Fetch POST (mode no-cors để tránh chặn CORS từ trình duyệt)
@@ -1106,30 +1121,30 @@ function exportWishesToCsv() {
     }
     playSound('click');
 
+    // Thứ tự cột giống Google Sheet
     const headers = [
-        "ID",
         "Thời Gian Gửi",
+        "MSSV Người Gửi",
+        "Họ Tên Người Gửi",
         "MSSV Người Nhận",
         "Họ Tên Người Nhận",
         "Phân Ban Người Nhận",
-        "MSSV Người Gửi",
-        "Họ Tên Người Gửi",
-        "Tên Hiển Thị (Ẩn Danh)",
-        "Nội Dung Lời Chúc",
-        "Trạng Thái Đăng Post"
+        "Ngày Sinh Người Nhận",
+        "Nội Dung Lời Chúc"
     ];
 
-    const rows = AppState.wishes.map((w, index) => [
-        index + 1,
+    const birthdayOf = (w) => w.receiver_birthday ||
+        (AppState.members.find(m => m.mssv === w.receiver_mssv) || {}).birthday || '';
+
+    const rows = AppState.wishes.map((w) => [
         `"${w.timestamp}"`,
-        `"\t${w.receiver_mssv}"`, // Thêm tab để Excel không biến số thành định dạng khoa học
+        `"\t${w.sender_mssv}"`, // Thêm tab để Excel không biến số thành định dạng khoa học
+        `"${w.sender_name}"`,
+        `"\t${w.receiver_mssv}"`,
         `"${w.receiver_name}"`,
         `"${w.receiver_dept}"`,
-        `"\t${w.sender_mssv}"`,
-        `"${w.sender_name}"`,
-        `"${w.sender_display}"`,
-        `"${w.wish_content.replace(/"/g, '""')}"`,
-        `"${w.status}"`
+        `"\t${birthdayOf(w)}"`,
+        `"${w.wish_content.replace(/"/g, '""')}"`
     ]);
 
     // Thêm UTF-8 BOM (\uFEFF) để Excel hiển thị đúng tiếng Việt có dấu
