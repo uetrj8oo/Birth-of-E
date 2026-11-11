@@ -313,6 +313,12 @@ function updateSoundButtonUI() {
 // ============================================================================
 // BƯỚC 1: XỬ LÝ NHẬP MSSV BẢN THÂN
 // ============================================================================
+// Màu huy hiệu theo phân ban: Sự kiện = xanh lá, Truyền thông = xanh dương
+function deptBadgeClass(dept) {
+    if (dept === 'Sự kiện') return 'badge-dept-event';
+    return 'badge-dept-media';
+}
+
 function handleSenderMssvInput(e) {
     const rawVal = e.target.value.trim();
     const feedbackBox = document.getElementById('senderFeedbackBox');
@@ -367,7 +373,7 @@ function handleSenderMssvInput(e) {
                         <div class="font-bold text-emerald-950 text-base">${found.name}</div>
                     </div>
                 </div>
-                <span class="${found.dept === 'Sự kiện' ? 'badge-dept-event' : 'badge-dept-media'}">
+                <span class="${deptBadgeClass(found.dept)}">
                     ${found.dept}
                 </span>
             </div>
@@ -489,7 +495,7 @@ function showGiftBox(target) {
     document.getElementById('giftRevealBirthday').innerText = target.birthday || '—';
     const deptEl = document.getElementById('giftRevealDept');
     deptEl.innerText = `Ban ${target.dept}`;
-    deptEl.className = target.dept === 'Sự kiện' ? 'badge-dept-event' : 'badge-dept-media';
+    deptEl.className = deptBadgeClass(target.dept);
 
     // Bấm vào hộp để mở ngay (nếu không bấm thì hộp tự mở sau ít giây)
     box.onclick = () => openGiftBox(target);
@@ -746,7 +752,7 @@ function renderWishWritingStep(target) {
     
     const targetDeptBadge = document.getElementById('targetDeptBadge');
     targetDeptBadge.innerText = `Ban ${target.dept}`;
-    targetDeptBadge.className = target.dept === 'Sự kiện' ? 'badge-dept-event' : 'badge-dept-media';
+    targetDeptBadge.className = deptBadgeClass(target.dept);
 
     // Tạo avatar chữ cái
     const initials = target.name.split(' ').map(w => w[0]).slice(-2).join('');
@@ -1252,7 +1258,7 @@ function renderMemberListTable() {
             <td class="p-2 font-mono font-bold text-sm text-zinc-900">${m.mssv}</td>
             <td class="p-2 font-semibold text-zinc-800">${m.name}</td>
             <td class="p-2">
-                <span class="${m.dept === 'Sự kiện' ? 'badge-dept-event' : 'badge-dept-media'}">
+                <span class="${deptBadgeClass(m.dept)}">
                     ${m.dept}
                 </span>
             </td>

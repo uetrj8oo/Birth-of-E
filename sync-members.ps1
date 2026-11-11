@@ -41,7 +41,7 @@ foreach ($si in $ssDoc.SelectNodes('//m:si', $n1)) {
     $strings += (($si.SelectNodes('.//m:t', $n1) | ForEach-Object { $_.InnerText }) -join '')
 }
 
-# Cột trong file: B=THÁNG, C=STT, D=HỌ VÀ TÊN, E=NGÀY SINH, F=MSSV
+# Cột trong file: B=THÁNG, C=STT, D=HỌ VÀ TÊN, E=NGÀY SINH, F=MSSV, G=PHÂN BAN (Sự kiện / Truyền thông / Điều hành)
 $rows = @(); $month = ''
 foreach ($row in $shDoc.SelectNodes('//m:row', $n2)) {
     $cells = @{}
@@ -55,7 +55,7 @@ foreach ($row in $shDoc.SelectNodes('//m:row', $n2)) {
     $stt = [string]$cells['C']; $name = ([string]$cells['D']).Trim()
     if ($stt -notmatch '^\d+$' -or -not $name) { continue }
     if ($cells['B']) { $month = ([string]$cells['B']).Trim() }
-    $dept = if ($oldDept.ContainsKey($name)) { $oldDept[$name] } else { 'Sự kiện' }
+    $dept = if (([string]$cells['G']).Trim()) { ([string]$cells['G']).Trim() } elseif ($oldDept.ContainsKey($name)) { $oldDept[$name] } else { 'Sự kiện' }
     $rows += [pscustomobject]@{
         stt = [int]$stt; name = $name; birthday = ([string]$cells['E']).Trim()
         month = $month; mssv = (([string]$cells['F']) -replace '\D', ''); dept = $dept

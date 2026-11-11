@@ -4,7 +4,7 @@
  * ============================================================================
  * Thứ tự cột trong Google Sheet:
  *   A Thời gian gửi | B MSSV người gửi | C Họ tên người gửi | D MSSV người nhận
- *   E Họ tên người nhận | F Phân ban người nhận (thả xuống: xanh lá / xanh dương)
+ *   E Họ tên người nhận | F Phân ban người nhận (thả xuống: Sự kiện xanh lá / Truyền thông xanh dương)
  *   G Ngày sinh người nhận | H Nội dung lời chúc
  *
  * CÀI ĐẶT:
